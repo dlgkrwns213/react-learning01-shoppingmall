@@ -7,15 +7,18 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, lazy, Suspense, useEffect, useState } from 'react';
 import data from './data.js';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom';
-import Detail from './routes/Detail.js';
-import Cart from './routes/Cart.js';
+// import Detail from './routes/Detail.js';
+// import Cart from './routes/Cart.js';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
 export let Context1 = createContext();
+
+const Detail = lazy(() => import('./routes/Detail.js'));
+const Cart = lazy(() => import('./routes/Cart.js'));
 
 function App() {
   let [shoes, setShoes] = useState(data);
@@ -53,7 +56,7 @@ function App() {
 
       {/* <Link to='/'>홈</Link>
       <Link to='/detail'>상세페이지</Link> */}
-
+      <Suspense fallback={<div>로딩중~</div>}>
       <Routes>
         <Route path='/' element={
           <>
@@ -91,7 +94,8 @@ function App() {
 
         <Route path='*' element={<div>없는 페이지</div>}></Route>
       </Routes>
-      
+      </Suspense>
+
       {location.pathname === '/' && btnCnt < 2 && (
         <button onClick={()=>{
           axios.get(`https://codingapple1.github.io/shop/data${btnCnt+2}.json`)
