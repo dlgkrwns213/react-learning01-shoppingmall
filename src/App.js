@@ -14,23 +14,35 @@ import Detail from './routes/Detail.js';
 import Cart from './routes/Cart.js';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { useQueries, useQuery } from 'react-query';
 
 export let Context1 = createContext();
 
 function App() {
-  let [shoes, setShoes] = useState(data);
-  const [stocks, setStocks] = useState([10, 11, 12])
-  let navigate = useNavigate();
-  let [btnCnt, setBtnCnt] = useState(0);
-  const location = useLocation();
-
   useEffect(() => {
     // localStorage 설정
     if (localStorage.getItem('watched') === null)
       localStorage.setItem('watched', JSON.stringify([]));
   }, []);
 
+  let [shoes, setShoes] = useState(data);
+  const [stocks, setStocks] = useState([10, 11, 12])
+  let navigate = useNavigate();
+  let [btnCnt, setBtnCnt] = useState(0);
+  const location = useLocation();
+
   // console.log(shoes);
+
+  const result = useQuery('작명', () => 
+    axios.get('https://codingapple1.github.io/userdata.json')  
+    .then((a)=> {
+      return a.data
+    }),
+    { staleTime: 2000 }
+  )
+  // 성공시 result.data
+  // 로딩중 result.isLoading
+  // 실패시 result.error
   
 
   return (
@@ -45,6 +57,11 @@ function App() {
             <Nav.Link onClick={()=>{navigate('/about')}}>About</Nav.Link>
             <Nav.Link onClick={()=>{navigate('/cart')}}>cart</Nav.Link>
             <Nav.Link onClick={()=>{navigate(-1)}}>Backspace</Nav.Link>
+          </Nav>
+          <Nav className='ms-auto text-light'>
+            { result.isLoading && '로딩중' }
+            { result.error && '에러' }
+            { result.data && result.data.name }
           </Nav>
         </Container>
       </Navbar>
